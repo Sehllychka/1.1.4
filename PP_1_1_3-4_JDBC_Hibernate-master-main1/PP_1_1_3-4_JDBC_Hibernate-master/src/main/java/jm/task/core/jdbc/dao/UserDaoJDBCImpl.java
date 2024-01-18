@@ -29,11 +29,6 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
             statement.executeUpdate(create);
             logger.info("The table has been created");
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                connection.rollback();
-            }
         } catch (SQLException e) {
             e.getStackTrace();
         }
