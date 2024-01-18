@@ -35,7 +35,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
     }
 
@@ -46,7 +46,7 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.executeUpdate(drop);
             logger.info("The table has been deleted");
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
     }
 
@@ -65,7 +65,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
     }
 
@@ -81,7 +81,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
     }
 
@@ -100,7 +100,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 users.add(user);
             }
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
         return users;
     }
@@ -117,7 +117,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            System.err.println("An error occurred while removing user: " + e.getMessage());
+            e.getStackTrace();
         }
     }
 }
