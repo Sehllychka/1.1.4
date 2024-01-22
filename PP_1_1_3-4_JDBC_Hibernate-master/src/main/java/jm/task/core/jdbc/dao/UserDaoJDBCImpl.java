@@ -29,6 +29,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 " age TINYINT)";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(create);
+            connection.commit();
             logger.info("The table has been created");
         } catch (SQLException e) {
             e.getStackTrace();
@@ -40,6 +41,7 @@ public class UserDaoJDBCImpl implements UserDao {
         String drop = "DROP TABLE IF EXISTS users";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(drop);
+            connection.commit();
             logger.info("The table has been deleted");
         } catch (SQLException e) {
             e.getStackTrace();
@@ -96,8 +98,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 byte age = resultSet.getByte("age");
                 User user = new User(id, name, lastName, age);
                 users.add(user);
-                connection.commit();
             }
+            connection.commit();
         } catch (SQLException e) {
             e.getStackTrace();
         }
@@ -110,6 +112,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(clean);
             logger.info("The user table has been cleared");
+            connection.commit();
         } catch (SQLException e) {
             e.getStackTrace();
         }
