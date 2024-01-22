@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class UserDaoJDBCImpl implements UserDao {
+    private final Connection connection = Util.getConnection();
     Logger logger = Logger.getLogger(Log.LOGGER_INSTANCE_NAME);
 
     public UserDaoJDBCImpl() {
@@ -26,7 +27,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 " name VARCHAR(255) ," +
                 " last_Name VARCHAR(255)," +
                 " age TINYINT)";
-        try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(create);
             logger.info("The table has been created");
         } catch (SQLException e) {
@@ -37,7 +38,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         String drop = "DROP TABLE IF EXISTS users";
-        try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(drop);
             logger.info("The table has been deleted");
         } catch (SQLException e) {
@@ -48,8 +49,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         String save = "INSERT INTO users (name, last_Name, age) VALUES (?, ?, ?)";
-        try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(save)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(save)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
@@ -57,6 +57,11 @@ public class UserDaoJDBCImpl implements UserDao {
             System.out.printf("User %s was added%n", name);
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.getStackTrace();
+            }
             e.getStackTrace();
         }
     }
@@ -64,12 +69,16 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         String remove = "DELETE FROM users WHERE id = ?";
-        try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(remove)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(remove)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.getStackTrace();
+            }
             e.getStackTrace();
         }
     }
@@ -78,7 +87,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String allUsers = "SELECT id, Name, last_Name, Age FROM users";
-        try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(allUsers);
             while (resultSet.next()) {
                 long id = resultSet.getLong("id");
@@ -87,6 +96,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 byte age = resultSet.getByte("age");
                 User user = new User(id, name, lastName, age);
                 users.add(user);
+                connection.commit();
             }
         } catch (SQLException e) {
             e.getStackTrace();
@@ -97,7 +107,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         String clean = "TRUNCATE TABLE users";
-        try (Connection connection = Util.getConnection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(clean);
             logger.info("The user table has been cleared");
         } catch (SQLException e) {
